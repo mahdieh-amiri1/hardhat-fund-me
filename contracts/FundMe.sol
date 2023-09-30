@@ -24,7 +24,11 @@ contract FundMe {
     mapping(address => uint256) private s_addressToAmountFunded;
     AggregatorV3Interface private s_priceFeed;
 
-    // Events (we have none!)
+    // Events
+    event FundEvent(address fundingAddress, uint256 fundingAmount);
+    event RefundEvent(address refundingAddress, uint256 refundingAmount);
+    event WithdrawEvent(address withdrawAddreess, uint256 withdrawAmount);
+
 
     // Modifiers
     modifier onlyOwner() {
@@ -50,6 +54,7 @@ contract FundMe {
 
     /// @notice Funds our contract based on the ETH/USD price
     function fund() public payable {
+
         require(
             msg.value.getConversionRate(s_priceFeed) >= MINIMUM_USD,
             "You need to spend more ETH!"
@@ -57,7 +62,20 @@ contract FundMe {
         // require(PriceConverter.getConversionRate(msg.value) >= MINIMUM_USD, "You need to spend more ETH!");
         s_addressToAmountFunded[msg.sender] += msg.value;
         s_funders.push(msg.sender);
+        emit FundEvent(msg.sender, msg.value);
     }
+
+    function refund(address payable refundingAddress) public onlyOwner {
+        uint256 refundingAmount = s_addressToAmountFunded[refundingAddress];
+        require(refundingAmount > 0, "There is no amount to refund!");
+
+        s_addressToAmountFunded[refundingAddress] = 0;
+        refundingAmount -= gasleft() * 2;
+        (bool success, ) = refundingAddress.call{value: refundingAmount}("");
+        require(success);
+        emit RefundEvent(refundingAddress, refundingAmount);
+    }
+
 
     function withdraw() public onlyOwner {
         for (
@@ -69,10 +87,11 @@ contract FundMe {
             s_addressToAmountFunded[funder] = 0;
         }
         s_funders = new address[](0);
-        // Transfer vs call vs Send
+        uint256 contractBalance = address(this).balance;
         // payable(msg.sender).transfer(address(this).balance);
-        (bool success, ) = i_owner.call{value: address(this).balance}("");
+        (bool success, ) = i_owner.call{value: contractBalance}("");
         require(success);
+        emit WithdrawEvent(msg.sender, contractBalance);
     }
 
     function cheaperWithdraw() public onlyOwner {
@@ -87,9 +106,13 @@ contract FundMe {
             s_addressToAmountFunded[funder] = 0;
         }
         s_funders = new address[](0);
+
+        uint256 contractBalance = address(this).balance;
+
         // payable(msg.sender).transfer(address(this).balance);
-        (bool success, ) = i_owner.call{value: address(this).balance}("");
+        (bool success, ) = i_owner.call{value: contractBalance}("");
         require(success);
+        emit WithdrawEvent(msg.sender, contractBalance);
     }
 
     /** @notice Gets the amount that an address has funded
