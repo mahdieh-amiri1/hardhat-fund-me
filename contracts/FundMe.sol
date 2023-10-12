@@ -76,6 +76,7 @@ contract FundMe {
 
 
     function withdraw() public onlyOwner {
+        require(address(this).balance != 0, "No balance to withdraw");
         for (
             uint256 funderIndex = 0;
             funderIndex < s_funders.length;
