@@ -29,13 +29,22 @@ contract FundMe {
     event RefundEvent(address refundingAddress, uint256 refundingAmount);
     event WithdrawEvent(address withdrawAddreess, uint256 withdrawAmount);
 
-
     // Modifiers
     modifier onlyOwner() {
         // require(msg.sender == i_owner);
         if (msg.sender != i_owner) revert FundMe__NotOwner();
         _;
     }
+
+    // Functions Order:
+    //// constructor
+    //// receive
+    //// fallback
+    //// external
+    //// public
+    //// internal
+    //// private
+    //// view / pure
 
     constructor(address priceFeed) {
         s_priceFeed = AggregatorV3Interface(priceFeed);
@@ -49,7 +58,6 @@ contract FundMe {
             msg.value.getConversionRate(s_priceFeed) >= MINIMUM_USD,
             "You need to spend more ETH!"
         );
-        // require(PriceConverter.getConversionRate(msg.value) >= MINIMUM_USD, "You need to spend more ETH!");
         s_addressToAmountFunded[msg.sender] += msg.value;
         s_funders.push(msg.sender);
         emit FundEvent(msg.sender, msg.value);
