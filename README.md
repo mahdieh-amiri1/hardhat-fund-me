@@ -1,11 +1,10 @@
 # Hardhat Fund Me
 
-*This repo has been updated to work with Sepolia Testnet over Goerli.*
+[FundMe - ScreenRecord](https://drive.google.com/file/d/1czc-EcZCIY_gKTjTYU5SgREiRta7KaOm/view?usp=sharing)
 
-This is a section of the Javascript Blockchain/Smart Contract FreeCodeCamp Course.
 
-*[⌨️ (10:00:48) Lesson 7: Hardhat Fund Me](https://www.youtube.com/watch?v=gyMwXuJrbJQ&t=36048s)*
-
+***
+***
 [Full Repo](https://github.com/smartcontractkit/full-blockchain-solidity-course-js)
 
 - [Hardhat Fund Me](#hardhat-fund-me)
